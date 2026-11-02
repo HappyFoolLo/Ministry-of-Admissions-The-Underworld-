@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ministry of Admissions — The Underworld</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #15120f;
+    --bg-2: #1d1812;
+    --panel: #221c15;
+    --bronze: #8a6a35;
+    --bronze-light: #c9a35c;
+    --parchment: #e9ddc2;
+    --parchment-dim: #b7ab8e;
+    --oxide: #7a2b24;
+    --oxide-light: #b84636;
+    --patina: #4a6058;
+    --rule: #3a3327;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #15120f;
+      --bg-2: #1d1812;
+      --panel: #221c15;
+      --parchment: #e9ddc2;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    font-family: 'EB Garamond', serif;
+    color: var(--parchment);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background:
+      radial-gradient(ellipse at 50% -10%, #2a2015 0%, transparent 55%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0, rgba(0,0,0,0.12) 1px, transparent 1px, transparent 3px),
+      var(--bg);
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .page {
+    width: 100%;
+    max-width: 680px;
+    padding: 56px 24px 64px;
+  }
+  .crest {
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.08em;
+    color: var(--bronze-light);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 40px);
+    text-align: center;
+    margin: 6px 0 2px;
+    color: var(--parchment);
+    letter-spacing: 0.02em;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--parchment-dim);
+    font-style: italic;
+    font-size: 17px;
+    margin: 0 0 36px;
+  }
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--bronze), transparent);
+    margin: 0 0 36px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .panel-label {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--bronze-light);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  form { display: flex; flex-direction: column; gap: 14px; }
+  label {
+    font-size: 15px;
+    color: var(--parchment-dim);
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+  }
+  input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    color: var(--parchment);
+    padding: 12px 14px;
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    border-radius: 2px;
+  }
+  input[type="text"]:focus {
+    outline: 2px solid var(--bronze-light);
+    outline-offset: 1px;
+  }
+  button {
+    background: var(--oxide);
+    color: var(--parchment);
+    border: 1px solid var(--oxide-light);
+    padding: 0 22px;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  button:hover { background: var(--oxide-light); }
+  button:focus-visible { outline: 2px solid var(--bronze-light); outline-offset: 2px; }
+
+  .error-state {
+    color: var(--oxide-light);
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-size: 14px;
+    padding: 14px 2px;
+  }
+
+  .results {
+    margin-top: 24px;
+  }
+  .results-heading {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--parchment-dim);
+    margin-bottom: 10px;
+    letter-spacing: 0.03em;
+  }
+  .ledger {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+  .ledger th {
+    text-align: left;
+    font-family: 'Cinzel', serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--bronze-light);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rule);
+    letter-spacing: 0.02em;
+  }
+  .ledger td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--parchment);
+  }
+  .ledger tr:last-child td { border-bottom: none; }
+  .table-tag {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: var(--bg);
+    background: var(--patina);
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+  .table-tag.guards { background: var(--oxide-light); }
+  .table-tag.staff { background: var(--bronze-light); color: #15120f; }
+  .empty-state {
+    color: var(--parchment-dim);
+    font-style: italic;
+    padding: 14px 2px;
+  }
+  footer {
+    text-align: center;
+    margin-top: 36px;
+    font-size: 12px;
+    color: var(--rule);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<!--
+  guards_note.txt
+  ----------------
+  Guards, please remember your ranks and access codes.
+  Thank you,
+  Persephone
+-->
+<div class="page">
+  <div class="crest">☥ ΑΔΗΣ · DIVISION OF RECORDS ☥</div>
+  <h1>Ministry of Admissions</h1>
+  <p class="subtitle">Search the registry of the condemned</p>
+  <div class="divider"></div>
+
+  <div class="panel">
+    <div class="panel-label">Registry Lookup</div>
+    <form id="searchForm">
+      <label for="nameInput">Search by soul's recorded name</label>
+      <div class="row">
+        <input type="text" id="nameInput" autocomplete="off" placeholder="e.g. Sisyphus" />
+        <button type="submit">Search</button>
+      </div>
+    </form>
+
+    <div class="results" id="resultsArea">
+      <div class="empty-state">No search performed yet.</div>
+    </div>
+  </div>
+
+  <footer>WE KNOW COMPUTERS AND STUFF</footer>
+</div>
+
+<script>
+(function () {
+  const prisoners = [
+    { name: "Sisyphus", crime: "Deceiving Thanatos", sentence: "Eternal boulder labor" },
+    { name: "Tantalus", crime: "Serving the gods his own son", sentence: "Eternal hunger and thirst" },
+    { name: "Ixion", crime: "Attempted violation of Hera", sentence: "Bound to a burning wheel" },
+    { name: "Prometheus", crime: "Theft of fire", sentence: "Daily liver consumption" },
+    { name: "Tityos", crime: "Assault on Leto", sentence: "Liver devoured by vultures" }
+  ];
+  const guards = [
+    { name: "Charon", rank: "Ferryman", access_code: "STYX-0441-FERRY" },
+    { name: "Cerberus Watch Captain", rank: "Gatekeeper", access_code: "GATE-7782-TRIP" },
+    { name: "Hecate's Warden", rank: "Night Overseer", access_code: "NOCT-1190-KEY" }
+  ];
+  const staff = [
+    { name: "Hades", username: "hades", password: "P0m3granate!Rule" },
+    { name: "Persephone", username: "persephone", password: "SixSeeds_Spring22" },
+    { name: "Thanatos", username: "thanatos", password: "Harvest0fSouls" },
+    { name: "Hypnos", username: "hypnos", password: "SlumberGate#9" },
+    { name: "Minos", username: "minos", password: "JudgeTheDead_01" }
+  ];
+
+  const form = document.getElementById('searchForm');
+  const nameInput = document.getElementById('nameInput');
+  const resultsArea = document.getElementById('resultsArea');
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderTable(title, tagClass, rows, columns) {
+    if (!rows.length) return '<div class="empty-state">No matching records found.</div>';
+    let html = `<span class="table-tag ${tagClass}">${title}</span>`;
+    html += '<table class="ledger"><thead><tr>';
+    columns.forEach(c => html += `<th>${c.label}</th>`);
+    html += '</tr></thead><tbody>';
+    rows.forEach(r => {
+      html += '<tr>';
+      columns.forEach(c => html += `<td>${escapeHtml(r[c.key])}</td>`);
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    return html;
+  }
+
+  const GENERIC_EMPTY = '<div class="empty-state">No matching records found.</div>';
+
+  // Naive literal-substring filter sitting in front of the query layer.
+  // Checks exact (case-sensitive) phrases only — a common real-world
+  // shortcut that case variation defeats.
+  function isFiltered(raw) {
+    const blocked = ['union select', 'or 1=1', 'or 1 = 1', "or '1'='1"];
+    return blocked.some(phrase => raw.includes(phrase));
+  }
+
+  // Simulated query interpreter for a controlled training environment.
+  // No live query text is shown to the user and no real database is involved;
+  // the underlying query shape must be inferred the way it would against a
+  // real, opaque application. Failures of any kind — filtered input, broken
+  // syntax, wrong column counts, unknown tables — all return the same
+  // generic empty result, same as a real no-match, so nothing here leaks
+  // which failure mode was hit.
+  function runQuery(raw) {
+    if (isFiltered(raw)) {
+      return GENERIC_EMPTY;
+    }
+
+    const input = raw;
+
+    // The input is substituted into: WHERE name = '<input>'
+    // A trailing comment (-- or #) neutralises everything after it,
+    // including the template's own closing quote.
+    const commentMatch = input.match(/(--|#)/);
+    const hasComment = !!commentMatch;
+    const activePart = hasComment ? input.slice(0, commentMatch.index) : input;
+
+    const quotesInActive = (activePart.match(/'/g) || []).length;
+    const totalQuotes = 1 + quotesInActive + (hasComment ? 0 : 1);
+    if (totalQuotes % 2 !== 0) {
+      return GENERIC_EMPTY;
+    }
+
+    const injected = activePart.trim();
+
+    const tautologyMatch = /^'\s*or\s+(1\s*=\s*1|true|'[^']*'\s*=\s*'[^']*')\s*$/i.test(injected);
+    const unionMatch = injected.match(/^'\s*union\s+select\s+(.+)$/i);
+
+    if (unionMatch) {
+      const cols = unionMatch[1].split(',').map(c => c.trim()).filter(Boolean);
+      if (cols.length !== 3) {
+        return GENERIC_EMPTY;
+      }
+      const colsLower = cols.join(' ').toLowerCase();
+      let output = renderTable('PRISONERS', '', prisoners, [
+        { key: 'name', label: 'Name' }, { key: 'crime', label: 'Crime' }, { key: 'sentence', label: 'Sentence' }
+      ]);
+      let matchedSomething = false;
+      if (colsLower.includes('guard') || colsLower.includes('access')) {
+        matchedSomething = true;
+        output += '<div style="height:18px"></div>';
+        output += renderTable('GUARDS — UNION RESULT', 'guards', guards, [
+          { key: 'name', label: 'Name' }, { key: 'rank', label: 'Rank' }, { key: 'access_code', label: 'Access Code' }
+        ]);
+      }
+      if (!matchedSomething) {
+        return GENERIC_EMPTY;
+      }
+      return output;
+    }
+
+    if (tautologyMatch) {
+      return renderTable('PRISONERS — ALL RECORDS', '', prisoners, [
+        { key: 'name', label: 'Name' }, { key: 'crime', label: 'Crime' }, { key: 'sentence', label: 'Sentence' }
+      ]);
+    }
+
+    const needle = injected.toLowerCase();
+    const match = prisoners.filter(p => p.name.toLowerCase() === needle || p.name.toLowerCase().includes(needle));
+    return renderTable('PRISONERS', '', match, [
+      { key: 'name', label: 'Name' }, { key: 'crime', label: 'Crime' }, { key: 'sentence', label: 'Sentence' }
+    ]);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    resultsArea.innerHTML = runQuery(nameInput.value);
+  });
+})();
+</script>
+</body>
+</html>
