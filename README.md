@@ -8,13 +8,13 @@ A small, self-contained web challenge for practising **SQL injection** in a safe
 
 It's a single static file with no build step and no dependencies.
 
-**Locally:** open `index.html` in any modern browser.
+**Locally:** download the repo and open `Ministry of Admissions — The Underworld.html` in any modern browser.
 
 **On GitHub Pages:**
 1. Push this repo to GitHub.
 2. Go to **Settings → Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, then save.
-4. Your challenge will be live at `https://<your-username>.github.io/<repo-name>/`.
+4. GitHub Pages serves `index.html` at the root URL, so either rename the file to `index.html` first, or visit `https://<your-username>.github.io/<repo-name>/Ministry%20of%20Admissions%20%E2%80%94%20The%20Underworld.html`.
 
 ## The challenge
 
@@ -49,7 +49,7 @@ If this were a real application, the fix is not a better blocklist. Use **parame
 
 ```
 .
-├── index.html   # the entire challenge (HTML, CSS, JS)
+├── Ministry of Admissions — The Underworld.html   # the entire challenge (HTML, CSS, JS)
 ├── README.md
 └── LICENSE
 ```
