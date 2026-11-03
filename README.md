@@ -1,63 +1,59 @@
-# Ministry of Admissions: The Underworld
+# Project Sisyphus — Phase 2 Lab: Admissions of the Damned
 
-A small, self-contained web challenge for practising **SQL injection** in a safe environment. The theme is Greek mythology: you're poking at the registry of the condemned, run by the Underworld's Division of Records.
+A real, deliberately vulnerable local target for SQL injection tool
+practice (sqlmap, Burp Suite, OWASP ZAP). This is a genuine SQLite
+backend with a raw, unparameterized query — not a simulation.
 
-> **This is a simulation.** There is no backend and no real database. All "queries" are interpreted by a few lines of client-side JavaScript, and every name, code, and credential in the data is fictional. Nothing here can touch a real system.
+## ⚠️ Run this only on your own machine, isolated from any network
+Bind address is `127.0.0.1` (localhost) by default. Do not change
+this to `0.0.0.0` or expose it beyond your own test environment.
 
-## Run it
+## Setup
 
-It's a single static file with no build step and no dependencies.
-
-**Locally:** download the repo and open `Ministry of Admissions — The Underworld.html` in any modern browser.
-
-**On GitHub Pages:**
-1. Push this repo to GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, then save.
-4. GitHub Pages serves `index.html` at the root URL, so either rename the file to `index.html` first, or visit `https://<your-username>.github.io/<repo-name>/Ministry%20of%20Admissions%20%E2%80%94%20The%20Underworld.html`.
-
-## The challenge
-
-Search the registry by a soul's recorded name. Behind the scenes the input is treated as if it were dropped straight into a query like:
-
-```sql
-SELECT ... FROM prisoners WHERE name = '<your input>'
+```bash
+cd hades_lab
+python3 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python3 build_db.py             # creates hades.db
+python3 app.py                  # starts the server on http://127.0.0.1:5000
 ```
 
-Your job is to work out how the application handles that input, and see what else the Ministry is keeping on file.
+## What's vulnerable
 
-Some things worth knowing:
+`GET /search?name=<value>` builds this query by string concatenation,
+with no parameterization or escaping:
 
-- Nothing about the underlying query is shown. You have to infer it, as you would against a real black-box app.
-- Any failure (bad syntax, wrong column count, unknown table, filtered input) returns the same generic "No matching records found" message, so error messages won't help you.
-- There's a naive filter in front of the query layer. Real-world filters like this are often weaker than they look.
-- Read the page source. Real developers leave things lying around.
-
-## Skills practised
-
-- Identifying injection points in a black-box application
-- Reasoning about query structure without error feedback
-- Quote balancing and comment-based truncation
-- `UNION`-based data extraction and column-count matching
-- Understanding why blocklist filtering is not a real defence
-
-## Defence notes
-
-If this were a real application, the fix is not a better blocklist. Use **parameterised queries / prepared statements**, apply least-privilege database accounts, and never store credentials in plaintext.
-
-## Project structure
-
-```
-.
-├── Ministry of Admissions — The Underworld.html   # the entire challenge (HTML, CSS, JS)
-├── README.md
-└── LICENSE
+```python
+query = "SELECT name, crime, sentence FROM prisoners WHERE name = '" + name + "'"
 ```
 
-## Disclaimer
+This supports classic techniques:
 
-This project is for education and authorised practice only. Don't use the techniques it teaches against systems you don't own or have explicit permission to test.
+- **Error-based discovery** — a stray `'` triggers a visible SQLite
+  error in the response, useful for confirming injection and mapping
+  syntax.
+- **Boolean/tautology bypass** — e.g. `' OR '1'='1` returns every
+  prisoner record.
+- **UNION-based extraction** — e.g.
+  `' UNION SELECT username, password, null FROM staff --`
+  pulls credentials out of the `staff` table, which the normal query
+  never touches. `' UNION SELECT name, rank, access_code FROM guards --`
+  does the same for `guards`.
 
-## License
+## Schema
 
-MIT. See [LICENSE](LICENSE).
+- `prisoners(id, name, crime, sentence)`
+- `guards(id, name, rank, access_code)`
+- `staff(id, name, username, password)` — includes Hades, Persephone,
+  Thanatos, Hypnos, Minos
+
+## Tool pointers
+
+- **sqlmap**: `sqlmap -u "http://127.0.0.1:5000/search?name=Sisyphus" --dbms=sqlite --dump`
+- **Burp Suite / OWASP ZAP**: proxy through the browser or `curl` and
+  fuzz the `name` parameter directly.
+
+## Resetting the data
+
+Re-run `python3 build_db.py` at any time to wipe and reseed `hades.db`.
