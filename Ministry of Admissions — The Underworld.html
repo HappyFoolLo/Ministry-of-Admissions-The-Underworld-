@@ -237,7 +237,7 @@
     </form>
 
     <div class="results" id="resultsArea">
-      <div class="empty-state">No search performed yet.</div>
+      <div class="empty-state">Loading registry…</div>
     </div>
   </div>
 
@@ -253,18 +253,35 @@
     { name: "Prometheus", crime: "Theft of fire", sentence: "Daily liver consumption" },
     { name: "Tityos", crime: "Assault on Leto", sentence: "Liver devoured by vultures" }
   ];
-  const guards = [
-    { name: "Charon", rank: "Ferryman", access_code: "STYX-0441-FERRY" },
-    { name: "Cerberus Watch Captain", rank: "Gatekeeper", access_code: "GATE-7782-TRIP" },
-    { name: "Hecate's Warden", rank: "Night Overseer", access_code: "NOCT-1190-KEY" }
-  ];
-  const staff = [
-    { name: "Hades", username: "hades", password: "P0m3granate!Rule" },
-    { name: "Persephone", username: "persephone", password: "SixSeeds_Spring22" },
-    { name: "Thanatos", username: "thanatos", password: "Harvest0fSouls" },
-    { name: "Hypnos", username: "hypnos", password: "SlumberGate#9" },
-    { name: "Minos", username: "minos", password: "JudgeTheDead_01" }
-  ];
+  // Records now live in the artifact's db capability, not in this file.
+  // Populated once at load; nothing sensitive is ever embedded in the
+  // page source.
+  let prisoners = [];
+  let guards = [];
+  let staff = [];
+  let dataReady = false;
+
+  async function loadRecords() {
+    try {
+      const db = await claude.use("db");
+      if (!db) {
+        resultsArea.innerHTML = '<div class="empty-state">Registry unavailable.</div>';
+        return;
+      }
+      const [pSnap, gSnap, sSnap] = await Promise.all([
+        db.collection("prisoners").get(),
+        db.collection("guards").get(),
+        db.collection("staff").get()
+      ]);
+      prisoners = pSnap.docs.map(d => d.data());
+      guards = gSnap.docs.map(d => d.data());
+      staff = sSnap.docs.map(d => d.data());
+      dataReady = true;
+      resultsArea.innerHTML = '<div class="empty-state">No search performed yet.</div>';
+    } catch (err) {
+      resultsArea.innerHTML = '<div class="empty-state">Registry unavailable.</div>';
+    }
+  }
 
   const form = document.getElementById('searchForm');
   const nameInput = document.getElementById('nameInput');
@@ -369,8 +386,11 @@
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (!dataReady) return;
     resultsArea.innerHTML = runQuery(nameInput.value);
   });
+
+  loadRecords();
 })();
 </script>
 </body>
