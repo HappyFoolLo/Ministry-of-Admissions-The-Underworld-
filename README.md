@@ -4,6 +4,8 @@ A small, self-contained web challenge for practising **SQL injection** in a safe
 
 > **This is a simulation.** There is no backend and no real database. All "queries" are interpreted by a few lines of client-side JavaScript, and every name, code, and credential in the data is fictional. Nothing here can touch a real system.
 
+> **Want the real thing?** A companion project runs the same challenge against a genuine Flask + SQLite backend, so you can use tools like sqlmap, Burp Suite and OWASP ZAP. See the [Flask version](https://github.com/<your-username>/<flask-repo-name>).
+
 ## Run it
 
 It's a single static file with no build step and no dependencies.
@@ -33,6 +35,14 @@ Some things worth knowing:
 - There's a naive filter in front of the query layer. Real-world filters like this are often weaker than they look.
 - Read the page source. Real developers leave things lying around.
 
+## Limitations
+
+Because everything runs in the browser, the simulated records are stored in the page's own JavaScript. Anyone who opens View Source or developer tools can read them without solving anything. That makes this version best suited to learning the *concepts* (query structure, quote balancing, filter bypass, UNION column matching) rather than working as a tamper-proof challenge.
+
+That limitation is also a lesson in itself: **secrets placed in front-end code are never secret.** Access control and sensitive data belong on the server.
+
+If you want a challenge where the data can only be reached through the injection, use the [Flask version](https://github.com/<your-username>/<flask-repo-name>), where all records live in a real SQLite database.
+
 ## Skills practised
 
 - Identifying injection points in a black-box application
@@ -40,10 +50,11 @@ Some things worth knowing:
 - Quote balancing and comment-based truncation
 - `UNION`-based data extraction and column-count matching
 - Understanding why blocklist filtering is not a real defence
+- Recognising why sensitive data must never ship in client-side code
 
 ## Defence notes
 
-If this were a real application, the fix is not a better blocklist. Use **parameterised queries / prepared statements**, apply least-privilege database accounts, and never store credentials in plaintext.
+If this were a real application, the fix is not a better blocklist. Use **parameterised queries / prepared statements**, apply least-privilege database accounts, keep sensitive data on the server, and never store credentials in plaintext.
 
 ## Project structure
 
